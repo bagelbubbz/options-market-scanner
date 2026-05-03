@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase";
-import { getYearPriceHistory, computeHistoricalIV } from "@/lib/tradier";
+import { getYearPriceHistory, computeHistoricalIV } from "@/lib/tiger";
 import { runBacktest, aggregateBacktest, toBacktestDbRows } from "@/lib/backtest";
 import { ALL_WATCHLIST } from "@/lib/watchlist";
 

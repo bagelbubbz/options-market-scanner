@@ -4,7 +4,7 @@ import {
   getExpirations,
   selectExpiration,
   getOptionsChain,
-} from "@/lib/tradier";
+} from "@/lib/tiger";
 import {
   calculateSkew25d,
   computeSkewZScore,

@@ -1,5 +1,5 @@
 import type { TradierHistoricalDay } from "./types";
-import { computeHistoricalIV } from "./tradier";
+import { computeHistoricalIV } from "./tiger";
 import { calculateIVR } from "./metrics";
 
 export type IVRBand = "30-50" | "50-70" | "70+";

@@ -4,7 +4,7 @@ import {
   selectExpiration,
   getOptionsChain,
   getYearPriceHistory,
-} from "@/lib/tradier";
+} from "@/lib/tiger";
 import { calculateImpliedMove } from "@/lib/metrics";
 import {
   getNextEarningsDate,

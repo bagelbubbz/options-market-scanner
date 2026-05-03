@@ -7,7 +7,7 @@ import {
   getYearPriceHistory,
   computeHistoricalIV,
   getQuote,
-} from "@/lib/tradier";
+} from "@/lib/tiger";
 import {
   buildTickerMetrics,
   DEFAULT_FILTER_CONFIG,
