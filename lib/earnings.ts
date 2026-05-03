@@ -33,40 +33,52 @@ interface TradierCalendar {
 }
 
 /**
- * Fetches the next earnings date from Tradier's company calendars endpoint.
- * Returns null if unavailable (requires fundamentals access on production).
+ * Fetches the next earnings date from Tiger Brokers' financial calendar endpoint.
+ * Returns null if unavailable — the price-gap heuristic is used as fallback.
  */
 export async function getNextEarningsDate(symbol: string): Promise<string | null> {
-  const baseUrl = process.env.TRADIER_BASE_URL ?? "https://sandbox.tradier.com/v1";
-  const token   = process.env.TRADIER_API_TOKEN ?? "";
-
+  // Tiger financial calendar requires a separate subscription; most accounts
+  // won't have access, so we gracefully return null and rely on the heuristic.
   try {
-    const res = await fetch(
-      `${baseUrl}/markets/fundamentals/calendars?symbols=${symbol}`,
-      {
-        headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
-        next: { revalidate: 3600 },
-      }
-    );
+    const crypto = await import("crypto");
+    const tigerId     = process.env.TIGER_ID ?? "";
+    const privateKey  = (process.env.TIGER_PRIVATE_KEY ?? "").replace(/\\n/g, "\n");
+    if (!tigerId || !privateKey) return null;
+
+    const params: Record<string, string> = {
+      tiger_id:    tigerId,
+      sign_type:   "RSA",
+      timestamp:   Date.now().toString(),
+      charset:     "UTF-8",
+      version:     "3.0",
+      method:      "financial_calendar",
+      biz_content: JSON.stringify({ symbol, market: "US", types: ["earnings"] }),
+    };
+
+    const payload = Object.keys(params).filter(k => params[k] !== "").sort()
+      .map(k => `${k}=${params[k]}`).join("&");
+    const signer = crypto.createSign("RSA-SHA256");
+    signer.update(payload, "utf8");
+    params.sign = signer.sign(privateKey, "base64");
+
+    const res = await fetch("https://openapi.tigerbrokers.com/interface", {
+      method:  "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body:    new URLSearchParams(params).toString(),
+      next:    { revalidate: 3600 },
+    });
 
     if (!res.ok) return null;
+    const json = await res.json();
+    if (json.code !== 0) return null;
 
-    const data = await res.json();
-
-    // Response shape varies; attempt to navigate to earnings events
-    const calendars: TradierCalendar[] =
-      data?.[0]?.tables?.corporate_calendars ?? [];
-
+    const events: Array<{ date: string; type: string }> = json.data?.items ?? [];
     const now = new Date();
-    const upcoming = calendars
-      .filter(
-        (c) =>
-          c.description?.toLowerCase().includes("earning") &&
-          new Date(c.date) > now
-      )
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const next = events
+      .filter(e => e.type?.toLowerCase().includes("earn") && new Date(e.date) > now)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
 
-    return upcoming[0]?.date ?? null;
+    return next?.date ?? null;
   } catch {
     return null;
   }
