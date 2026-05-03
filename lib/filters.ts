@@ -26,6 +26,16 @@ export const DEFAULT_FILTER_CONFIG: Tier1FilterConfig = {
   maxDaysToExpiry: 45,
 };
 
+// Looser thresholds for mid-cap / niche names with lower average daily volume
+export const MID_CAP_FILTER_CONFIG: Tier1FilterConfig = {
+  minIVR: 30,
+  minIV30: 0.20,
+  minAvgDailyVolume: 200_000,
+  minOptionOI: 50,
+  minDaysToExpiry: 21,
+  maxDaysToExpiry: 45,
+};
+
 // ─── Tier-1 filters ───────────────────────────────────────────────────────────
 
 export interface Tier1FilterResult {

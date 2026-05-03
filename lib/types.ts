@@ -137,6 +137,10 @@ export interface ScanResult {
   long_put_strike?: number;
   long_call_strike?: number;
   credit?: number;
+  watchlist_tier?: WatchlistTier;
+  backtest_win_rate?: number;
+  skew_25d?: number;
+  skew_z_score?: number;
   scanned_at: string;
 }
 
@@ -148,4 +152,38 @@ export interface Tier1FilterConfig {
   minOptionOI: number;
   maxDaysToExpiry: number;
   minDaysToExpiry: number;
+}
+
+// ─── Watchlist ─────────────────────────────────────────────────────────────────
+export type WatchlistTier = "large_cap" | "mid_cap";
+
+// ─── Skew ──────────────────────────────────────────────────────────────────────
+export interface SkewData {
+  symbol: string;
+  skew25d: number;
+  zScore: number | null;
+  isAlert: boolean;
+}
+
+// ─── Earnings ─────────────────────────────────────────────────────────────────
+export type EarningsRecommendation =
+  | "sell_premium"
+  | "buy_premium"
+  | "neutral"
+  | "insufficient_data";
+
+// ─── Backtest ─────────────────────────────────────────────────────────────────
+export type IVRBand = "30-50" | "50-70" | "70+";
+
+export interface BacktestBand {
+  ivrBand: IVRBand;
+  winRate: number;
+  sampleSize: number;
+  avgImpliedMove: number;
+  avgActualMove: number;
+}
+
+export interface BacktestSummary {
+  symbol: string;
+  bands: BacktestBand[];
 }
