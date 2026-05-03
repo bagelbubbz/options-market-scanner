@@ -106,9 +106,9 @@ create policy "public read scan_results"
 -- Only service role (API route) can write
 create policy "service insert scan_results"
   on public.scan_results for insert
-  using (auth.role() = 'service_role')
   with check (auth.role() = 'service_role');
 
 create policy "service write tickers"
   on public.tickers for all
-  using (auth.role() = 'service_role');
+  using (auth.role() = 'service_role')
+  with check (auth.role() = 'service_role');

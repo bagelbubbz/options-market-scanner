@@ -56,7 +56,6 @@ create policy "public read skew_snapshots"
   on public.skew_snapshots for select using (true);
 create policy "service insert skew_snapshots"
   on public.skew_snapshots for insert
-  using (auth.role() = 'service_role')
   with check (auth.role() = 'service_role');
 
 -- ─────────────────────────────────────────────────────────
@@ -81,7 +80,6 @@ create policy "public read earnings_history"
   on public.earnings_history for select using (true);
 create policy "service write earnings_history"
   on public.earnings_history for insert
-  using (auth.role() = 'service_role')
   with check (auth.role() = 'service_role');
 
 -- ─────────────────────────────────────────────────────────
@@ -111,7 +109,8 @@ create policy "public read backtest_results"
   on public.backtest_results for select using (true);
 create policy "service write backtest_results"
   on public.backtest_results for all
-  using (auth.role() = 'service_role');
+  using (auth.role() = 'service_role')
+  with check (auth.role() = 'service_role');
 
 -- ─────────────────────────────────────────────────────────
 -- Extend scan_results with new enrichment columns
